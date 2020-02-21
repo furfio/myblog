@@ -22,12 +22,87 @@ class MainController extends Controller{
             //用时间戳做session，并不安全
             let openId=new Date().getTime()
             this.ctx.session.openId={ 'openId':openId }
-            //把openID传回前台，这样前台就不用查询数据库了，节省资源
+            //把openID传回登录页面，这样前台就不用查询数据库了，节省资源
             this.ctx.body={'data':'登录成功','openId':openId}
 
         }else{
             this.ctx.body={data:'登录失败'}
         }
+    }
+
+    //后台文章分类信息
+    async getTypeInfo(){
+        //获取数据库里的type表里的东西
+        const resType = await this.app.mysql.select('type')
+        this.ctx.body={data:resType}
+    }
+
+    //添加文章
+    async addArticle(){
+
+        let tmpArticle= this.ctx.request.body
+        const result = await this.app.mysql.insert('article',tmpArticle)
+        const insertSuccess = result.affectedRows === 1
+        const insertId = result.insertId
+        //返回两个参数，第一个是是否保存成功，第二个是插入数据的id
+        //此id用于日后修改数据时使用
+        this.ctx.body={
+            isSuccess:insertSuccess,
+            insertId:insertId
+        }
+    }
+
+    //修改文章
+    async updateArticle(){
+        let tmpArticle= this.ctx.request.body
+
+        const result = await this.app.mysql.update('article', tmpArticle);
+        const updateSuccess = result.affectedRows === 1;
+        console.log(updateSuccess)
+        this.ctx.body={
+            isSuccess:updateSuccess
+        }
+    }
+
+    //获得文章列表
+    async getArticleList(){
+
+        let sql = 'SELECT article.id as id,'+
+            'article.title as title,'+
+            'article.introduce as introduce,'+
+            "FROM_UNIXTIME(article.addTime,'%Y-%m-%d' ) as addTime,"+
+            'type.typeName as typeName '+
+            'FROM article LEFT JOIN type ON article.type_id = type.id '+
+            'ORDER BY article.id DESC '
+            // 根据文章id进行倒序排列
+        const resList = await this.app.mysql.query(sql)
+        this.ctx.body={list:resList}
+
+    }
+
+    //删除文章
+    async delArticle(){
+        let id = this.ctx.params.id
+        const res = await this.app.mysql.delete('article',{'id':id})
+        this.ctx.body={data:res}
+    }
+
+    //根据文章ID得到文章详情，用于修改文章
+    async getArticleById(){
+        let id = this.ctx.params.id
+
+        let sql = 'SELECT article.id as id,'+
+            'article.title as title,'+
+            'article.introduce as introduce,'+
+            'article.article_content as article_content,'+
+            "FROM_UNIXTIME(article.addTime,'%Y-%m-%d' ) as addTime,"+
+            'article.view_count as view_count ,'+
+            'type.typeName as typeName ,'+
+            'type.id as typeId '+
+            'FROM article LEFT JOIN type ON article.type_id = type.id '+
+            'WHERE article.id='+id
+        const result = await this.app.mysql.query(sql)
+        this.ctx.body={data:result}
     }
 
 }

@@ -3,12 +3,13 @@ import { Layout, Menu, Breadcrumb, Icon } from 'antd';
 import '../static/AdminIndex.css'
 import {Route} from "react-router-dom"
 import AddArticle from "./AddArticle";
+import ArticleList from "./ArticleList";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
 //用https://ant.design/components/layout-cn/里现成的布局
 
-function AdminIndex(){
+function AdminIndex(props){
 
     //这个变量是页面侧边栏收起合住的状态变量
     const [collapsed,setCollapsed] = useState(false)
@@ -16,6 +17,15 @@ function AdminIndex(){
     const onCollapse = collapsed => {
         setCollapsed(collapsed)
     };
+
+    const handleClickArticle = e=>{
+        if(e.key=='AddArticle'){
+            props.history.push('/index/add')
+        }else{
+            props.history.push('/index/list')
+        }
+
+    }
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
@@ -32,6 +42,7 @@ function AdminIndex(){
                     </Menu.Item>
                     <SubMenu
                         key="sub1"
+                        onClick={handleClickArticle}
                         title={
                             <span>
                                 <Icon type="user" />
@@ -39,8 +50,8 @@ function AdminIndex(){
                             </span>
                         }
                     >
-                        <Menu.Item key="3">添加文章</Menu.Item>
-                        <Menu.Item key="4">文章列表</Menu.Item>
+                        <Menu.Item key="AddArticle">添加文章</Menu.Item>
+                        <Menu.Item key="ArticleList">文章列表</Menu.Item>
 
                     </SubMenu>
 
@@ -61,6 +72,9 @@ function AdminIndex(){
                         {/*把add article组件放到这里*/}
                         <div>
                             <Route path="/index/" exact  component={AddArticle} />
+                            <Route path="/index/add/" exact  component={AddArticle} />
+                            <Route path="/index/list/" exact  component={ArticleList} />
+                            <Route path="/index/add/:id" exact  component={AddArticle} />
                         </div>
                         博客工作台
                     </div>

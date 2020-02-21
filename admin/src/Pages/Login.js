@@ -1,9 +1,12 @@
 import React , {useState} from 'react';
 import '../static/Login.css'
 import 'antd/dist/antd.css';
-import { Card, Input, Icon,Button ,Spin } from 'antd';
+import axios from 'axios'
+import servicePath from "../config/apiUrl";
+import { Card, Input, Icon,Button ,Spin,message } from 'antd';
+
 //isLoading主要用于控制Spin组件是否进入加载状态，进入加载状态可以有效防止重复提交。
-function Login(){
+function Login(props){
 
     const [userName , setUserName] = useState('')
     const [password , setPassword] = useState('')
@@ -11,6 +14,43 @@ function Login(){
 
     const checkLogin = ()=>{
         setIsLoading(true)
+
+        if(!userName){
+            message.error('用户名不能为空')
+            setTimeout(()=>{
+                setIsLoading(false)
+            },500)
+            return false
+        }else if(!password){
+            message.error('密码不能为空')
+            setTimeout(()=>{
+                setIsLoading(false)
+            },500)
+            return false
+        }
+        let dataProps = {
+            'userName':userName,
+            'password':password
+        }
+        axios({
+            method:'post',
+            url:servicePath.checkLogin,
+            data:dataProps,
+            //前端和后端共享session
+            withCredentials: true
+        }).then(
+            res=>{
+                setIsLoading(false)
+                if(res.data.data=='登录成功'){
+                    localStorage.setItem('openId',res.data.openId)
+                    //密码正确就跳转到首页
+                    props.history.push('/index')
+                }else{
+                    message.error('用户名密码错误')
+                }
+            }
+        )
+
         setTimeout(()=>{
             setIsLoading(false)
         },1000)
