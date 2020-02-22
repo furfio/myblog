@@ -6,6 +6,8 @@ class MainController extends Controller{
 
     async index(){
         //首页的文章列表数据
+        //this.ctx: 当前请求的上下文 Context 对象的实例
+
         this.ctx.body='hi api'
     }
 
@@ -70,6 +72,7 @@ class MainController extends Controller{
         let sql = 'SELECT article.id as id,'+
             'article.title as title,'+
             'article.introduce as introduce,'+
+            'article.is_ok as is_ok,'+
             "FROM_UNIXTIME(article.addTime,'%Y-%m-%d' ) as addTime,"+
             'type.typeName as typeName '+
             'FROM article LEFT JOIN type ON article.type_id = type.id '+
@@ -104,6 +107,39 @@ class MainController extends Controller{
         const result = await this.app.mysql.query(sql)
         this.ctx.body={data:result}
     }
+
+    //获得留言列表
+    async getMessageList(){
+
+        let sql = 'SELECT message.who as who,'+
+            'message.message as message,'+
+            'message.is_ok as is_ok,'+
+            'message.id as id '+
+            'FROM message'
+
+        const resList = await this.app.mysql.query(sql)
+        this.ctx.body={list:resList}
+
+    }
+    //把留言变为可见状态
+    async allowMessage(){
+        let id_message = this.ctx.params.id
+
+        const result = await this.app.mysql.update('message',
+            {
+                is_ok: 1 //需要修改的数据
+            }, {
+                where: {
+                    id: id_message
+                } //修改查询条件
+            });
+        const updateSuccess = result.affectedRows === 1;
+        console.log(updateSuccess)
+        this.ctx.body={
+            isSuccess:updateSuccess
+        }
+    }
+
 
 }
 

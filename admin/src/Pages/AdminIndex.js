@@ -1,9 +1,10 @@
 import React,{useState} from 'react';
-import { Layout, Menu, Breadcrumb, Icon } from 'antd';
+import { Layout, Menu, Breadcrumb, Icon ,Tag} from 'antd';
 import '../static/AdminIndex.css'
 import {Route} from "react-router-dom"
 import AddArticle from "./AddArticle";
 import ArticleList from "./ArticleList";
+import MessageList from "./messageManage";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -21,8 +22,10 @@ function AdminIndex(props){
     const handleClickArticle = e=>{
         if(e.key=='AddArticle'){
             props.history.push('/index/add')
-        }else{
+        }else if(e.key=='ArticleList'){
             props.history.push('/index/list')
+        }else if(e.key=='MessageList'){
+            props.history.push('/index/message')
         }
 
     }
@@ -32,13 +35,10 @@ function AdminIndex(props){
             <Sider  collapsible collapsed={collapsed} onCollapse={onCollapse}>
                 <div className="logo" />
                 <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-                    <Menu.Item key="1">
+                    <Menu.Item
+                        key="1">
                         <Icon type="pie-chart" />
                         <span>工作台</span>
-                    </Menu.Item>
-                    <Menu.Item key="2">
-                        <Icon type="desktop" />
-                        <span>添加文章</span>
                     </Menu.Item>
                     <SubMenu
                         key="sub1"
@@ -50,13 +50,21 @@ function AdminIndex(props){
                             </span>
                         }
                     >
-                        <Menu.Item key="AddArticle">添加文章</Menu.Item>
-                        <Menu.Item key="ArticleList">文章列表</Menu.Item>
+                        <Menu.Item key="AddArticle">
+                            <Icon type="edit" />
+                            添加文章
+                        </Menu.Item>
+                        <Menu.Item key="ArticleList">
+                            <Icon type="ordered-list" />
+                            文章列表
+                        </Menu.Item>
 
                     </SubMenu>
 
-                    <Menu.Item key="9">
-                        <Icon type="file" />
+                    <Menu.Item
+                        onClick={handleClickArticle}
+                        key="MessageList">
+                        <Icon type="message" />
                         <span>留言管理</span>
                     </Menu.Item>
                 </Menu>
@@ -69,14 +77,16 @@ function AdminIndex(props){
                         <Breadcrumb.Item>工作台</Breadcrumb.Item>
                     </Breadcrumb>
                     <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
-                        {/*把add article组件放到这里*/}
+                        {/*把add article等子组件放到这里，根据按钮显选择显示添加文章还是
+                        修改文章*/}
                         <div>
-                            <Route path="/index/" exact  component={AddArticle} />
                             <Route path="/index/add/" exact  component={AddArticle} />
                             <Route path="/index/list/" exact  component={ArticleList} />
+                            <Route path="/index/message/" exact  component={MessageList} />
                             <Route path="/index/add/:id" exact  component={AddArticle} />
                         </div>
-                        博客工作台
+                        <img src={require('../static/img/hello.png')} width="200px"/>
+
                     </div>
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>Dzy.com</Footer>

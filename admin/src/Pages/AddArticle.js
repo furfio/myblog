@@ -17,7 +17,6 @@ function AddArticle(props){
     const [introducemd,setIntroducemd] = useState()            //简介的markdown内容
     const [introducehtml,setIntroducehtml] = useState('等待编辑') //简介的html内容
     const [showDate,setShowDate] = useState()   //发布日期
-    const [updateDate,setUpdateDate] = useState() //修改日志的日期
     const [typeInfo ,setTypeInfo] = useState([]) // 文章类别信息
     const [selectedType,setSelectType] = useState('请选择类别') //选择的文章类别
 
@@ -25,7 +24,8 @@ function AddArticle(props){
     useEffect(()=>{
         //获取文章类型
         getTypeInfo()
-        //获取文章ID，判断是修改还是增加
+        //获取文章ID，判断是修改还是增加，如果进入此页面时传了值（文章id）
+        //就是要修改这篇文章，否则articleId就是0，代表新增一篇文章
         let tmpId = props.match.params.id
         if(tmpId){
             setArticleId(tmpId)
@@ -57,7 +57,7 @@ function AddArticle(props){
     }
 
     //从中台得到文章类别信息
-    //而且带有进程守护
+    //而且带有路由守护
     const getTypeInfo =()=>{
         axios({
             method:'get',
@@ -107,7 +107,7 @@ function AddArticle(props){
         let datetext= showDate.replace('-','/') //把字符串转换成时间戳
         dataProps.addTime =(new Date(datetext).getTime())/1000
 
-        //判断是保存还是修改，如果等于0就是新增
+        //判断是保存还是修改，如果等于0就是新增，不是0的话，id就代表文章id
         if(articleId==0){
             console.log('articleId=:'+articleId)
             dataProps.view_count =Math.ceil(Math.random()*100)+1000
@@ -188,6 +188,7 @@ function AddArticle(props){
                         <Col span={4}>
                             &nbsp;
                             <Select defaultValue={selectedType} size="large" onChange={selectTypeHandler}>
+                                {/*typeInfo在页面初始化时就利用useEffect从数据库中查到了*/}
                                 {
                                     typeInfo.map((item,index)=>{
                                         return (<Option key={index} value={item.id}>{item.typeName}</Option>)

@@ -5,7 +5,7 @@ import axios from 'axios'
 import  servicePath  from '../config/apiUrl'
 //即只用Model中的confirm，把他单独解构出来
 const { confirm } = Modal;
-function ArticleList(props){
+function MessageList(props){
 
     const [list,setList]=useState([])
 
@@ -13,11 +13,11 @@ function ArticleList(props){
         getList()
     },[])  //数组为空，表示只加载一次
 
-    //得到文章列表
+    //得到留言列表
     const getList = ()=>{
         axios({
             method:'get',
-            url: servicePath.getArticleList,
+            url: servicePath.getMessageList,
             withCredentials: true,
             header:{ 'Access-Control-Allow-Origin':'*' }
         }).then(
@@ -28,17 +28,27 @@ function ArticleList(props){
         )
     }
 
-    //删除文章的方法
-    const delArticle = (id)=>{
+    //发布留言
+    const allowMessage = (id)=>{
         //用antd，Modal里的confirm组件
         confirm({
-            title: '确定要删除这篇博客文章吗?',
-            content: '如果你点击OK按钮，文章将会永远被删除，无法恢复。',
+            title: '确定要发布这条留言吗?',
+            content: '如果你点击OK按钮，所有人都会看到这条留言。',
             onOk() {
-                axios(servicePath.delArticle+id,{ withCredentials: true}).then(
+                axios({
+                    method:'get',
+                    url:servicePath.allowMessage+id,
+                    header:{ 'Access-Control-Allow-Origin':'*' },
+                    //允许跨域检验cookie，中间件就是用来检验cookie的
+                    withCredentials: true
+                }).then(
                     res=>{
-                        message.success('文章删除成功')
-                        getList()
+                        if(res.data.data=="没有登录"){
+                            localStorage.removeItem('openId')
+                            props.history.push('/')
+                        }else{
+                            message.success('留言添加成功，请刷新页面')
+                        }
                     }
                 )
             },
@@ -46,15 +56,9 @@ function ArticleList(props){
                 message.success('没有任何改变')
             },
         });
-
     }
 
-    //修改文章
-    const updateArticle = (id)=>{
 
-        props.history.push('/index/add/'+id)
-
-    }
 
     return (
         <div>
@@ -62,26 +66,17 @@ function ArticleList(props){
                 header={
                     <Row className="list-div">
                         {/*//span=8表示24格布局，占用8格*/}
-                        <Col span={8}>
-                            <b>标题</b>
-                        </Col>
-                        <Col span={3}>
-                            <b>类别</b>
-                        </Col>
-                        <Col span={3}>
-                            <b>发布时间</b>
+                        <Col span={5}>
+                            <b>留言人</b>
                         </Col>
 
-                        <Col span={3}>
-                            <b>浏览量</b>
+                        <Col span={13}>
+                            <b>留言</b>
                         </Col>
-
                         <Col span={3}>
-                            <b>状态</b>
+                            <b>留言状态</b>
                         </Col>
-
-                        <Col span={4}>
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <Col span={3}>
                             <b>操作</b>
                         </Col>
                     </Row>
@@ -92,35 +87,23 @@ function ArticleList(props){
                 renderItem={item => (
                     <List.Item>
                         <Row className="list-div">
-                            <Col span={8}>
-                                {item.title}
+                            <Col span={5}>
+                                {item.who}
                             </Col>
-                            <Col span={3}>
-                                {item.typeName}
-                            </Col>
-                            <Col span={3}>
-                                {item.addTime}
-                            </Col>
-                            <Col span={3}>
-                                {item.view_count}
+                            <Col span={13}>
+                                {item.message}
                             </Col>
 
                             <Col span={3}>
                                 <Tag color={item.is_ok==0?'volcano':'cyan'}>{item.is_ok==0?'未发布':'已发布'}</Tag>
                             </Col>
-
-
-                            <Col span={4}>
+                            <Col span={3}>
+                                {/*<Tag color={item.is_ok==0?'volcano':'cyan'}>{item.is_ok==0?'未发布':'已发布'}</Tag>*/}
                                 <Button type="primary"
-                                    onClick={()=>{updateArticle(item.id)}}
-                                >修改</Button>&nbsp;
-
-                                <Button
-                                    onClick={()=>{delArticle(item.id)}}
-                                >删除 </Button>&nbsp;
-
-
+                                         onClick={()=>{allowMessage(item.id)}}
+                                >发布留言</Button>
                             </Col>
+
                         </Row>
 
                     </List.Item>
@@ -132,4 +115,4 @@ function ArticleList(props){
 
 }
 
-export default ArticleList
+export default MessageList

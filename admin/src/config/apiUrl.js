@@ -9,8 +9,10 @@ let servicePath = {
     addArticle:ipUrl+'addArticle',//添加文章
     updateArticle:ipUrl+'updateArticle',//修改文章
     getArticleList:ipUrl+'getArticleList',//获取文章列表
+    getMessageList:ipUrl+'getMessageList',//获取文章列表
     delArticle:ipUrl+'delArticle/',//根据传入的id删除文章
     getArticleById:ipUrl+'getArticleById/',//根据id获得文章详情
+    allowMessage:ipUrl+'allowMessage/',//根据留言的id发布留言
 
 }
 export default servicePath;
