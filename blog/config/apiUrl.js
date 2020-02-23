@@ -9,6 +9,7 @@ let servicePath = {
     getArticleById:ipUrl + 'getArticleById/',  // 文章详细页内容接口 ,需要接收参数
     getTypeInfo:ipUrl + 'getTypeInfo',  // 获取文章的类别接口
     getListById:ipUrl + 'getListById/',  // 根据类别Id获取文章列表
+    addMessage:ipUrl + 'addMessage',  // 添加留言
 
 
 }

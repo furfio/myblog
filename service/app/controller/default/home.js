@@ -92,6 +92,18 @@ class HomeController extends Controller {
 
     }
 
+    //添加留言
+    async addMessage(){
+
+        let tmpArticle= this.ctx.request.body
+        const result = await this.app.mysql.insert('message',tmpArticle)
+        const insertSuccess = result.affectedRows === 1
+        //返回两个参数，第一个是是否保存成功
+        this.ctx.body={
+            isSuccess:insertSuccess,
+        }
+    }
+
 }
 
 module.exports = HomeController;

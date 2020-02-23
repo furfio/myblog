@@ -1,7 +1,7 @@
 import React ,{useState}from 'react'
 import Head from 'next/head'
 import Link from "next/link";
-import {List,Row,Col,Icon,Comment,Avatar,Card} from "antd";
+import {List,Row,Col,Icon,Comment,Avatar,Card,Input,Search} from "antd";
 import Header from "../components/Header";
 import '../static/style/pages/index.css'
 import Author from "../components/Author";
@@ -17,7 +17,12 @@ import 'highlight.js/styles/monokai-sublime.css'
 //下面返回的res.data即为list，而list.data=res.data.data
 //因为中台查到数据库时多加了一层json，data:xxxx
 const Home = (list) => {
-    const [mylist,setMylist]=useState(list.list)
+    const { TextArea } = Input;
+    const { Search } = Input;
+
+    const [mylist,setMylist]=useState(list.list)//留言列表
+    const [comment,setComment]=useState('')//留言内容
+    const [name,setName]=useState('')//留言者姓名
 
     const renderer=new marked.Renderer()
     marked.setOptions({
@@ -35,14 +40,42 @@ const Home = (list) => {
         }
     });
 
+   const addMessage = ()=>{
+      if(name==='') {
+            alert('请输入姓名')
+            return false
+        }else if(comment===''){
+            alert('请输入留言')
+            return false
+        }
+        let dataProps={}   //传递到接口的参数
+        dataProps.who=name
+        dataProps.message=comment
+        console.log(dataProps)
+        axios({
+            method:'post',
+            url:servicePath.addMessage,
+            data:dataProps,
+        }).then(
+            res=>{
+                if(res.data.isSuccess){
+                    alert('留言添加成功')
+                }else{
+                    alert('留言添加失败')
+                }
+
+            }
+        )
+    }
+
     return(
         <div >
             <Head>
                 <title>Home</title>
             </Head>
             <Header />
-            {/*next.js只支持下面这种形式的css，本项目的css借助babel仍然用传统的css导入方式
-            这导致背景图片等性质不能设置，此属性必须用下面的方式*/}
+            {/*next.js只支持下面这种形式的css，本项目的css借助babel仍然用传统的css导入方式*/}
+            {/*这导致背景图片等性质不能设置，此属性必须用下面的方式*/}
             <style jsx>
                 {`
                     .background {background-image: url("../static/img/bg8.png");}
@@ -73,6 +106,29 @@ const Home = (list) => {
                                      )
                                  }}
                             ></div>
+                            <div className="addMessage">
+                                <Row>
+                                    <Col>
+                                        <TextArea
+                                            placeholder="您的留言是？"
+                                            value={comment}
+                                            onChange={e=>{setComment(e.target.value)}}
+                                            rows={4} />
+                                    </Col>
+                                    <br />
+                                    <Col>
+                                        <Search
+                                            value={name}
+                                            onChange={e=>{setName(e.target.value)}}
+                                            placeholder="您的名字是？"
+                                            enterButton="添加"
+                                            size="large"
+                                            onSearch={addMessage}
+                                        />
+                                    </Col>
+                                </Row>
+
+                            </div>
                         </Col>
                         <Col span={1}/>
                         <Col className="comm-right" span={4}>
