@@ -20,7 +20,8 @@ class HomeController extends Controller {
             "FROM_UNIXTIME(article.addTime,'%Y-%m-%d %H:%i:%s' ) as addTime,"+
             'article.view_count as view_count ,'+
             'type.typeName as typeName '+
-            'FROM article LEFT JOIN type ON article.type_id = type.id'
+            'FROM article LEFT JOIN type ON article.type_id = type.id '+
+            'WHERE is_ok=1'
         const results = await this.app.mysql.query(sql)
         this.ctx.body={
             data:results
@@ -71,9 +72,23 @@ class HomeController extends Controller {
             'article.view_count as view_count ,'+
             'type.typeName as typeName '+
             'FROM article LEFT JOIN type ON article.type_id = type.id '+
-            'WHERE type_id='+id
+            'WHERE type_id='+id+' AND is_ok=1'
         const result = await this.app.mysql.query(sql)
         this.ctx.body={data:result}
+
+    }
+
+    //获得留言列表(只选择is_ok=1的留言，即后台允许发布的留言)
+    async getMessageList(){
+
+        let sql = 'SELECT message.who as who,'+
+            'message.message as message,'+
+            'message.id as id '+
+            'FROM message '+
+            'WHERE is_ok=1'
+
+        const resList = await this.app.mysql.query(sql)
+        this.ctx.body={list:resList}
 
     }
 

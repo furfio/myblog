@@ -1,7 +1,7 @@
 import React ,{useState}from 'react'
 import Head from 'next/head'
 import Link from "next/link";
-import {List,Row,Col,Icon} from "antd";
+import {List,Row,Col,Icon,Comment,Avatar,Card} from "antd";
 import Header from "../components/Header";
 import '../static/style/pages/index.css'
 import Author from "../components/Author";
@@ -17,7 +17,7 @@ import 'highlight.js/styles/monokai-sublime.css'
 //下面返回的res.data即为list，而list.data=res.data.data
 //因为中台查到数据库时多加了一层json，data:xxxx
 const Home = (list) => {
-    const [mylist,setMylist]=useState(list.data)
+    const [mylist,setMylist]=useState(list.list)
 
     const renderer=new marked.Renderer()
     marked.setOptions({
@@ -36,65 +36,107 @@ const Home = (list) => {
     });
 
     return(
-        <div>
+        <div >
             <Head>
                 <title>Home</title>
             </Head>
             <Header />
+            {/*next.js只支持下面这种形式的css，本项目的css借助babel仍然用传统的css导入方式
+            这导致背景图片等性质不能设置，此属性必须用下面的方式*/}
+            <style jsx>
+                {`
+                    .background {background-image: url("../static/img/bg8.png");}
+                `}
+            </style>
 
-            <Row className="comm-main" type="flex" justify="center">
-                <Col className="comm-left" xs={24} sm={24} md={16} lg={18} xl={14}  >
-                    <List
-                        header={<div>最新日志   </div>}
-                        itemLayout="vertical"
-                        dataSource={mylist}
-                        renderItem={item=>(
-                            <List.Item>
-                                <div className="list-title">
-                                    {/*把id传给/details，根据id查询文章*/}
-                                    <Link href={{pathname:'/details',query:{id:item.id}}}>
-                                        <a>{item.title}</a>
-                                    </Link>
-                                </div>
+            <div className="background" >
+                <div className="whiteBackground">
+                    <Row className="comm-main" type="flex" justify="center">
+                        <Col className="comm-left" span={16}  >
+                            <div className="list-title">
+                                <p>博客简介</p>
+                            </div>
+                            <div className="list-icon">
+                                <span><Icon type="calendar"/> 2020-02-23 00:00:00 </span>
+                                <span><Icon type="folder"/>简介</span>
+                                <span><Icon type="fire"/>100</span>
+                            </div>
+                            <div className="list-context"
+                                 dangerouslySetInnerHTML={{__html:marked(
+                                     "# 写在前面\n" +
+                                         "~~~\n" +
+                                         "此博客文章采用markdown格式编写\n" +
+                                         "~~~\n" +
+                                         "本博客仅供个人学习，浏览使用\n"+
+                                         "### 具体文章请转到工作，图书，生活板块\n"+
+                                         "# 欢迎留言！！"
+                                     )
+                                 }}
+                            ></div>
+                        </Col>
+                        <Col span={1}/>
+                        <Col className="comm-right" span={4}>
+                            <Author/>
 
-                                <div className="list-icon">
-                                    <span><Icon type="calendar"/>{item.addTime}  </span>
-                                    <span><Icon type="folder"/>{item.typeName} </span>
-                                    <span><Icon type="fire"/>{item.view_count}人  </span>
-                                </div>
-                            {/*//首页中的文章介绍也支持markdown解析*/}
-                                <div className="list-context"
-                                    dangerouslySetInnerHTML={{__html:marked(item.introduce)}}
-                                ></div>
+                            <Card title="留言区" hoverable={true} bordered={false} style={{
+                                width: 200
+                            }}>
+                                <List
+                                    header={<div></div>}
+                                    itemLayout="vertical"
+                                    dataSource={mylist}
+                                    renderItem={item=>(
+                                        <li>
+                                            <Comment
+                                                avatar={
+                                                    <Avatar style={{ backgroundColor: '#87d068' }} icon="user" />
+                                                }
+                                                author={item.who}
+                                                content={item.message}
+                                            />
+                                        </li>
+                                    )}
+                                />
+                            </Card>
 
-                            </List.Item>
-                        )}
-                    />
-                </Col>
+                        </Col>
+                    </Row>
+                    <Footer/>
+                </div>
 
-                <Col className="comm-right" xs={0} sm={0} md={7} lg={5} xl={4}>
-                    <Author/>
-                    <Advert/>
-                </Col>
-            </Row>
+            </div>
 
-            <Footer/>
+
         </div>
     )
 }
 
-//利用Axios从远端获取数据
+//利用Axios从远端获取留言数据
 Home.getInitialProps = async ()=>{
     const promise = new Promise((resolve)=>{
-        axios(servicePath.getArticleList).then(
+        axios(servicePath.getMessageList).then(
             (res)=>{
-                console.log('远程获取数据结果:',res.data.data)
+                console.log(res.data)
+                //必须写resolve(res.data)，这不是简单地返回一个值，这个data是固定的名称
+                // ，而不是在中台自己封装的json键值
                 resolve(res.data)
+
             }
         )
     })
-
     return await promise
 }
+// Home.getInitialProps = async ()=>{
+//     const promise = new Promise((resolve)=>{
+//         axios(servicePath.getArticleList).then(
+//             (res)=>{
+//                 // console.log('远程获取数据结果:',res.data.data)
+//                 resolve(res.data)
+//             }
+//         )
+//     })
+//
+//     // return await promise
+// }
 
 export default Home
