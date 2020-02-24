@@ -7,6 +7,7 @@ import Author from "../components/Author";
 import Advert from "../components/Advertise";
 import Footer from "../components/Footer";
 import axios from 'axios'
+import "../static/style/pages/index.css"
 import marked from 'marked'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/monokai-sublime.css'
@@ -51,49 +52,59 @@ const Details = (props) => {
             </Head>
             <Header />
 
-            <Row className="comm-main" type="flex" justify="center">
-                <Col className="comm-left" xs={24} sm={24} md={16} lg={18} xl={14}  >
-                    <div>
-                        <div className="bread-div">
-                            <Breadcrumb>
-                                <Breadcrumb.Item><a href="/">首页</a></Breadcrumb.Item>
-                                <Breadcrumb.Item><a href="/">视频列表</a></Breadcrumb.Item>
-                                <Breadcrumb.Item>xxx</Breadcrumb.Item>
-                            </Breadcrumb>
-                        </div>
+            {/*next.js只支持下面这种形式的css，本项目的css借助babel仍然用传统的css导入方式
+            这导致背景图片等性质不能设置，此属性必须用下面的方式*/}
+            <style jsx>
+                {`
+                    .background {background-image: url("../static/img/bg4.png");}
+                `}
+            </style>
 
-                        <div className="detailed-title">
-                            更新到第10集
-                        </div>
+            <div className="background" >
+                <div className="whiteBackground">
+                    <Row className="comm-main" type="flex" justify="center">
+                        <Col className="comm-left" span={16}  >
+                            <div>
+                                <div className="bread-div">
+                                    <Breadcrumb>
+                                        <Breadcrumb.Item><a href="/">首页</a></Breadcrumb.Item>
+                                        <Breadcrumb.Item>文章详情</Breadcrumb.Item>
+                                    </Breadcrumb>
+                                </div>
+                                <br />
 
-                        <div className="list-icon center">
-                            <span><Icon type="calendar"/>2020-02-17</span>
-                            <span><Icon type="folder"/>视频教程</span>
-                            <span><Icon type="fire"/>5498人</span>
-                        </div>
+                                <div className="list-icon center">
+                                    <span><Icon type="calendar"/>2020-02-17</span>
+                                    <span><Icon type="folder"/>文章详情</span>
+                                    <span><Icon type="fire"/>0人</span>
+                                </div><br />
 
-                        <div className="detailed-content"
-                            dangerouslySetInnerHTML={{__html:html}}
-                        >
-                        </div>
-                    </div>
-                </Col>
+                                <div className="detailed-content"
+                                     dangerouslySetInnerHTML={{__html:html}}
+                                >
+                                </div>
+                            </div>
+                        </Col>
+                        <Col span={1}/>
 
-                <Col className="comm-right" xs={0} sm={0} md={7} lg={5} xl={4}>
-                    <Author/>
-                    <Advert/>
-                    {/*放在Affix中的组件在页面滑动时位置不变*/}
-                    {/*offsetTop={5}表示距离顶部距离为5*/}
-                    <Affix offsetTop={5}>
-                        <div className="detailed-nav comm-box">
-                            <div className="nav-title">文章目录</div>
-                            {tocify && tocify.render()}
-                        </div>
-                    </Affix>
+                        <Col className="comm-right" span={4}>
+                            <Author/>
+                            <Advert/>
+                            {/*放在Affix中的组件在页面滑动时位置不变*/}
+                            {/*offsetTop={5}表示距离顶部距离为5*/}
+                            <Affix offsetTop={5}>
+                                <div className="detailed-nav comm-box">
+                                    <div className="nav-title">文章目录</div>
+                                    {tocify && tocify.render()}
+                                </div>
+                            </Affix>
 
-                </Col>
-            </Row>
-            <Footer/>
+                        </Col>
+                    </Row>
+                    <Footer/>
+                </div>
+            </div>
+
         </div>
     )
 }
