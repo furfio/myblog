@@ -87,7 +87,7 @@ const Details = (props) => {
                         </Col>
                         <Col span={1}/>
 
-                        <Col className="comm-right" span={4}>
+                        <Col className="comm-right" xs={0} sm={0} md={4} lg={4} xl={4}>
                             <Author/>
                             <Advert/>
                             {/*放在Affix中的组件在页面滑动时位置不变*/}

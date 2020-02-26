@@ -131,7 +131,7 @@ const Home = (list) => {
                             </div>
                         </Col>
                         <Col span={1}/>
-                        <Col className="comm-right" span={4}>
+                        <Col className="comm-right"  xs={0} sm={0} md={4} lg={4} xl={4}>
                             <Author/>
 
                             <Card title="留言区" hoverable={true} bordered={false} style={{

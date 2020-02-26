@@ -81,6 +81,65 @@ function AddArticle(props){
     const selectTypeHandler =(value)=>{
         setSelectType(value)
     }
+
+    //点击后暂存文章的函数
+    const tempSaveArticle = ()=>{
+
+        let dataPropsTemp={}   //传递到接口的参数
+        dataPropsTemp.type_id = selectedType
+        dataPropsTemp.title = articleTitle
+        dataPropsTemp.article_content =articleContent
+        dataPropsTemp.introduce =introducemd
+        let datetext= showDate.replace('-','/') //把字符串转换成时间戳
+        dataPropsTemp.addTime =(new Date(datetext).getTime())/1000
+
+        //判断是保存还是修改，如果等于0就是新增，不是0的话，id就代表文章id
+        if(articleId==0){
+            dataPropsTemp.is_ok=0
+            console.log('articleId=:'+articleId)
+            dataPropsTemp.view_count =Math.ceil(Math.random()*100)+1000
+            axios({
+                method:'post',
+                url:servicePath.addArticle,
+                data:dataPropsTemp,
+                //前端和后端共享session，允许跨域的cookie（session就是一种cookie）
+                withCredentials: true
+            }).then(
+                res=>{
+                    setArticleId(res.data.insertId)
+                    if(res.data.isSuccess){
+                        message.success('文章暂存成功')
+                    }else{
+                        message.error('文章暂存失败');
+                    }
+
+                }
+            )
+        }else{  //如果是修改文章
+            dataPropsTemp.is_ok=0
+
+            dataPropsTemp.id = articleId
+            axios({
+                method:'post',
+                url:servicePath.updateArticle,
+                header:{ 'Access-Control-Allow-Origin':'*' },
+                data:dataPropsTemp,
+                withCredentials: true
+            }).then(
+                res=>{
+
+                    if(res.data.isSuccess){
+                        message.success('文章暂存成功')
+                    }else{
+                        message.error('暂存失败');
+                    }
+
+
+                }
+            )
+        }
+    }
+
     //点击发布文章后对应的函数
     const saveArticle = ()=>{
         if(!selectedType){
@@ -109,6 +168,7 @@ function AddArticle(props){
 
         //判断是保存还是修改，如果等于0就是新增，不是0的话，id就代表文章id
         if(articleId==0){
+            dataProps.is_ok=1
             console.log('articleId=:'+articleId)
             dataProps.view_count =Math.ceil(Math.random()*100)+1000
             axios({
@@ -129,6 +189,7 @@ function AddArticle(props){
                 }
             )
         }else{  //如果是修改文章
+            dataProps.is_ok=1
 
             dataProps.id = articleId
             axios({
@@ -219,7 +280,7 @@ function AddArticle(props){
                 <Col span={6}>
                     <Row>
                         <Col span={24}>
-                            <Button  size="large">暂存文章</Button>&nbsp;
+                            <Button  size="large" onClick={tempSaveArticle}>暂存文章</Button>&nbsp;
                             <Button type="primary" size="large" onClick={saveArticle}>发布文章</Button>
                             <br/>
                         </Col>
