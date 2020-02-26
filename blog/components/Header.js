@@ -40,11 +40,11 @@ const Header=()=> {
     return(
         <div className="header">
             <Row type="flex" justify="center">
-                <Col span={7}>
+                <Col xs={0} sm={0} md={4} lg={4} xl={4}>
                     <span className="header-logo">dzy</span>
                     <span className="header-text">个人博客</span>
                 </Col>
-                <Col span={5}/>
+                <Col xs={0} sm={0} md={2} lg={2} xl={4}/>
                 <Col span={12}>
                     {/*首页key=0，其他页的key由数据库查询得到*/}
                     <Menu mode="horizontal" onClick={handleClick}>
