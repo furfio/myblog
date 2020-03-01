@@ -5,6 +5,7 @@ import {Route} from "react-router-dom"
 import AddArticle from "./AddArticle";
 import ArticleList from "./ArticleList";
 import MessageList from "./messageManage";
+import pictureManage from "./pictureManage";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -26,6 +27,8 @@ function AdminIndex(props){
             props.history.push('/index/list')
         }else if(e.key=='MessageList'){
             props.history.push('/index/message')
+        }else if(e.key=='PictureManage'){
+            props.history.push('/index/picture')
         }
 
     }
@@ -62,10 +65,17 @@ function AdminIndex(props){
                     </SubMenu>
 
                     <Menu.Item
+                    onClick={handleClickArticle}
+                    key="MessageList">
+                    <Icon type="message" />
+                    <span>留言管理</span>
+                    </Menu.Item>
+
+                    <Menu.Item
                         onClick={handleClickArticle}
-                        key="MessageList">
-                        <Icon type="message" />
-                        <span>留言管理</span>
+                        key="PictureManage">
+                        <Icon type="picture" />
+                        <span>图片管理</span>
                     </Menu.Item>
                 </Menu>
             </Sider>
@@ -81,6 +91,7 @@ function AdminIndex(props){
                         修改文章*/}
                         <div>
                             <Route path="/index/add/" exact  component={AddArticle} />
+                            <Route path="/index/picture/" exact  component={pictureManage} />
                             <Route path="/index/list/" exact  component={ArticleList} />
                             <Route path="/index/message/" exact  component={MessageList} />
                             <Route path="/index/add/:id" exact  component={AddArticle} />
